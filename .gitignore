@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+artifacts
+cache
+typechain-types
+.env
+.env*.local
+*.log
+vercel
+.vercel
