@@ -16,7 +16,7 @@ export const wagmiConfig = createConfig({
       shimDisconnect: true,
     }),
     coinbaseWallet({
-      appName: "Base Reward Tap",
+      appName: "TipJar",
       preference: "all",
       version: "4",
     }),

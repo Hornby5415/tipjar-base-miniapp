@@ -11,14 +11,29 @@ contract TipJar {
         uint256 tipCount;
     }
 
+    struct Poll {
+        address creator;
+        string question;
+        string optionA;
+        string optionB;
+        uint256 votesA;
+        uint256 votesB;
+        uint256 createdAt;
+        bool active;
+    }
+
     mapping(address => Creator) public creators;
     address[] public creatorList;
     mapping(address => bool) public isCreator;
     mapping(address => uint256) public tipsSentCount;
     mapping(address => uint256) public supporterCount;
     mapping(address => mapping(address => bool)) public hasSupported;
+    Poll[] public polls;
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
 
     event CreatorRegistered(address indexed creator, string name, string category);
+    event PollCreated(uint256 indexed pollId, address indexed creator, string question);
+    event VoteCast(uint256 indexed pollId, address indexed voter, uint8 option);
     event TipSent(
         address indexed from,
         address indexed to,
@@ -49,6 +64,66 @@ contract TipJar {
         creator.registered = true;
 
         emit CreatorRegistered(msg.sender, name, category);
+    }
+
+    function createPoll(
+        string calldata question,
+        string calldata optionA,
+        string calldata optionB
+    ) external returns (uint256 pollId) {
+        require(bytes(question).length > 0, "Question is required");
+        require(bytes(question).length <= 140, "Question is too long");
+        require(bytes(optionA).length > 0, "Option A is required");
+        require(bytes(optionB).length > 0, "Option B is required");
+        require(bytes(optionA).length <= 48, "Option A is too long");
+        require(bytes(optionB).length <= 48, "Option B is too long");
+
+        if (!isCreator[msg.sender]) {
+            Creator storage creator = creators[msg.sender];
+            creator.name = "TipJar Creator";
+            creator.tagline = "Community poll host";
+            creator.category = "Onchain voting";
+            creator.registered = true;
+            creatorList.push(msg.sender);
+            isCreator[msg.sender] = true;
+
+            emit CreatorRegistered(msg.sender, creator.name, creator.category);
+        }
+
+        polls.push(
+            Poll({
+                creator: msg.sender,
+                question: question,
+                optionA: optionA,
+                optionB: optionB,
+                votesA: 0,
+                votesB: 0,
+                createdAt: block.timestamp,
+                active: true
+            })
+        );
+
+        pollId = polls.length - 1;
+        emit PollCreated(pollId, msg.sender, question);
+    }
+
+    function castVote(uint256 pollId, uint8 option) external {
+        require(pollId < polls.length, "Poll does not exist");
+        require(option == 1 || option == 2, "Invalid option");
+        require(!hasVoted[pollId][msg.sender], "Already voted");
+
+        Poll storage poll = polls[pollId];
+        require(poll.active, "Poll is closed");
+
+        hasVoted[pollId][msg.sender] = true;
+
+        if (option == 1) {
+            poll.votesA += 1;
+        } else {
+            poll.votesB += 1;
+        }
+
+        emit VoteCast(pollId, msg.sender, option);
     }
 
     function sendTip(address payable creator, string calldata message) external payable {
@@ -100,5 +175,14 @@ contract TipJar {
 
     function hasUserSupported(address supporter, address creator) external view returns (bool) {
         return hasSupported[supporter][creator];
+    }
+
+    function getPoll(uint256 pollId) external view returns (Poll memory) {
+        require(pollId < polls.length, "Poll does not exist");
+        return polls[pollId];
+    }
+
+    function pollCount() external view returns (uint256) {
+        return polls.length;
     }
 }

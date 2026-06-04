@@ -6,14 +6,14 @@ module.exports = {
       colors: {
         base: {
           blue: "#0052ff",
-          ink: "#172033",
-          line: "#dbe5f5",
-          soft: "#f4f8ff",
+          ink: "#1c1917",
+          line: "#fde68a",
+          soft: "#fff8ef",
           yellow: "#ffd166"
         }
       },
       boxShadow: {
-        soft: "0 12px 36px rgba(0, 82, 255, 0.08)"
+        soft: "0 14px 38px rgba(194, 65, 12, 0.12)"
       }
     }
   },
