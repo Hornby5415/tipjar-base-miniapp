@@ -29,8 +29,13 @@ type PollState = {
   selected: 1 | 2;
   votesA: number;
   votesB: number;
-  localPollId: number;
+  publishedProofHash: string;
 };
+
+type PendingAction =
+  | { type: "create"; poll: Pick<PollState, "question" | "optionA" | "optionB" | "selected"> }
+  | { type: "vote"; option: 1 | 2 }
+  | null;
 
 const emptyReward: RewardState = {
   points: 0,
@@ -43,9 +48,9 @@ const defaultPoll: PollState = {
   optionA: "Community funding",
   optionB: "Social payment tools",
   selected: 1,
-  votesA: 12,
-  votesB: 9,
-  localPollId: 0,
+  votesA: 0,
+  votesB: 0,
+  publishedProofHash: "",
 };
 
 const isConfigured = contractAddress !== zeroAddress;
@@ -57,18 +62,21 @@ export default function Home() {
   const { disconnect } = useDisconnect();
   const { switchChain, isPending: isSwitchPending } = useSwitchChain();
   const { data: txHash, writeContract, isPending: isWritePending, error: writeError } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+  const { data: receipt, isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
   const [reward, setReward] = useState<RewardState>(emptyReward);
   const [poll, setPoll] = useState<PollState>(defaultPoll);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [processedReceiptHash, setProcessedReceiptHash] = useState<string>("");
   const [walletOpen, setWalletOpen] = useState(false);
-  const [status, setStatus] = useState("Create or choose a poll, then cast one transparent vote.");
+  const [status, setStatus] = useState("Publish a poll on Base, then cast one transparent vote.");
   const [hasAutoTried, setHasAutoTried] = useState(false);
 
   const isWrongNetwork = isConnected && chainId !== targetChainId;
   const totalVotes = poll.votesA + poll.votesB;
+  const isPollPublished = Boolean(poll.publishedProofHash);
   const isBusy = isWritePending || isConfirming || isSwitchPending;
 
   const walletOptions = useMemo(() => {
@@ -103,13 +111,41 @@ export default function Home() {
   }, [poll]);
 
   useEffect(() => {
-    if (writeError) setStatus(getFriendlyError(writeError));
+    if (!writeError) return;
+    setPendingAction(null);
+    setStatus(getFriendlyError(writeError));
   }, [writeError]);
 
   useEffect(() => {
-    if (!isConfirmed) return;
-    setStatus("Onchain vote proof saved with Base attribution.");
-  }, [isConfirmed]);
+    if (!isConfirmed || !receipt || !pendingAction || processedReceiptHash === receipt.transactionHash) return;
+
+    setProcessedReceiptHash(receipt.transactionHash);
+
+    if (pendingAction.type === "create") {
+      setPoll({
+        ...pendingAction.poll,
+        votesA: 0,
+        votesB: 0,
+        publishedProofHash: receipt.transactionHash,
+      });
+      setStatus("Poll is published after a confirmed Base contract interaction.");
+      setPendingAction(null);
+      return;
+    }
+
+    setPoll((current) => ({
+      ...current,
+      votesA: pendingAction.option === 1 ? current.votesA + 1 : current.votesA,
+      votesB: pendingAction.option === 2 ? current.votesB + 1 : current.votesB,
+    }));
+    setReward((current) => ({
+      points: current.points + 25,
+      votes: current.votes + 1,
+      lastAction: new Date().toISOString(),
+    }));
+    setStatus("+25 points added after the onchain vote was confirmed.");
+    setPendingAction(null);
+  }, [isConfirmed, pendingAction, processedReceiptHash, receipt]);
 
   useEffect(() => {
     if (hasAutoTried || isConnected || typeof window === "undefined") return;
@@ -131,25 +167,56 @@ export default function Home() {
     setWalletOpen(false);
   };
 
-  const handleCreatePoll = useCallback(() => {
+  const updateDraftPoll = (updates: Partial<Pick<PollState, "question" | "optionA" | "optionB">>) => {
     setPoll((current) => ({
       ...current,
+      ...updates,
       votesA: 0,
       votesB: 0,
-      localPollId: current.localPollId + 1,
+      publishedProofHash: "",
     }));
-    setStatus("Poll is ready. First vote earns an instant reward.");
+    setStatus("Draft changed. Publish it on Base before voting.");
+  };
 
-    if (!isConnected || isWrongNetwork || !isConfigured) return;
+  const handleCreatePoll = useCallback(() => {
+    if (!isConnected) {
+      setWalletOpen(true);
+      return;
+    }
+
+    if (isWrongNetwork) {
+      switchChain({ chainId: targetChainId });
+      return;
+    }
+
+    if (!isConfigured) {
+      setStatus("Contract is not configured for onchain publishing.");
+      return;
+    }
+
+    const nextPoll = {
+      question: poll.question.trim(),
+      optionA: poll.optionA.trim(),
+      optionB: poll.optionB.trim(),
+      selected: poll.selected,
+    };
+
+    if (!nextPoll.question || !nextPoll.optionA || !nextPoll.optionB) {
+      setStatus("Poll question and both options are required.");
+      return;
+    }
+
+    setPendingAction({ type: "create", poll: nextPoll });
+    setStatus("Confirm the transaction to publish this poll on Base.");
 
     writeContract({
       address: contractAddress,
       abi: tipJarAbi,
-      functionName: "createPoll",
-      args: [poll.question, poll.optionA, poll.optionB],
+      functionName: "registerCreator",
+      args: ["TipJar Poll", clampTagline(nextPoll.question), "Onchain voting"],
       dataSuffix: builderCodeDataSuffix,
     });
-  }, [isConnected, isWrongNetwork, poll.optionA, poll.optionB, poll.question, writeContract]);
+  }, [isConnected, isWrongNetwork, poll.optionA, poll.optionB, poll.question, poll.selected, switchChain, writeContract]);
 
   const handlePrimaryAction = () => {
     if (!isConnected) {
@@ -162,25 +229,24 @@ export default function Home() {
       return;
     }
 
-    setPoll((current) => ({
-      ...current,
-      votesA: current.selected === 1 ? current.votesA + 1 : current.votesA,
-      votesB: current.selected === 2 ? current.votesB + 1 : current.votesB,
-    }));
-    setReward((current) => ({
-      points: current.points + 25,
-      votes: current.votes + 1,
-      lastAction: new Date().toISOString(),
-    }));
-    setStatus("+25 points added instantly. Your vote is visible in the poll.");
+    if (!isConfigured) {
+      setStatus("Contract is not configured for onchain voting.");
+      return;
+    }
 
-    if (!isConfigured) return;
+    if (!poll.publishedProofHash) {
+      setStatus("Publish the poll on Base before voting.");
+      return;
+    }
+
+    setPendingAction({ type: "vote", option: poll.selected });
+    setStatus("Confirm the transaction to cast your vote on Base.");
 
     writeContract({
       address: contractAddress,
       abi: tipJarAbi,
-      functionName: "castVote",
-      args: [BigInt(poll.localPollId), poll.selected],
+      functionName: "registerCreator",
+      args: ["TipJar Vote", clampTagline(`${poll.selected === 1 ? poll.optionA : poll.optionB} vote confirmed`), "Poll vote"],
       dataSuffix: builderCodeDataSuffix,
     });
   };
@@ -190,8 +256,12 @@ export default function Home() {
     : isWrongNetwork
       ? `Switch to ${targetChain.name}`
       : isBusy
-        ? "Saving Vote"
-        : "Cast Vote";
+        ? pendingAction?.type === "create"
+          ? "Publishing Poll"
+          : "Saving Vote"
+        : isPollPublished
+          ? "Cast Vote"
+          : "Publish Poll First";
 
   return (
     <main className="min-h-screen bg-[#fff8ef] text-stone-950">
@@ -237,7 +307,7 @@ export default function Home() {
                 className="h-12 rounded-lg border border-amber-200 bg-white px-3 text-sm font-bold text-stone-900 outline-none transition focus:border-orange-500"
                 maxLength={140}
                 value={poll.question}
-                onChange={(event) => setPoll((current) => ({ ...current, question: event.target.value }))}
+                onChange={(event) => updateDraftPoll({ question: event.target.value })}
               />
             </label>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -247,7 +317,7 @@ export default function Home() {
                   className="h-12 rounded-lg border border-amber-200 bg-white px-3 text-sm font-bold outline-none transition focus:border-orange-500"
                   maxLength={48}
                   value={poll.optionA}
-                  onChange={(event) => setPoll((current) => ({ ...current, optionA: event.target.value }))}
+                  onChange={(event) => updateDraftPoll({ optionA: event.target.value })}
                 />
               </label>
               <label className="grid gap-2">
@@ -256,7 +326,7 @@ export default function Home() {
                   className="h-12 rounded-lg border border-amber-200 bg-white px-3 text-sm font-bold outline-none transition focus:border-orange-500"
                   maxLength={48}
                   value={poll.optionB}
-                  onChange={(event) => setPoll((current) => ({ ...current, optionB: event.target.value }))}
+                  onChange={(event) => updateDraftPoll({ optionB: event.target.value })}
                 />
               </label>
             </div>
@@ -434,6 +504,10 @@ function shorten(value: string) {
 function getPercent(value: number, total: number) {
   if (total === 0) return 0;
   return Math.round((value / total) * 100);
+}
+
+function clampTagline(value: string) {
+  return value.trim().slice(0, 120) || "TipJar interaction";
 }
 
 function getFriendlyError(error: unknown) {

@@ -44,7 +44,9 @@ The Base App embedded wallet can auto-connect when detected. Users can still dis
 
 ## Contract
 
-`contracts/TipJar.sol` keeps the original creator registration and tipping functions, and adds onchain voting:
+The deployed Base contract at `0x7436e55bb95Ce016938c16f8cB0B9158e537d088` supports creator registration and tipping functions. The MiniApp uses `registerCreator` as the confirmed onchain proof for poll publishing and voting because this is the method currently available on the deployed contract.
+
+The local contract source also includes poll helpers for a future redeploy:
 
 - `createPoll(question, optionA, optionB)`
 - `castVote(pollId, option)`
