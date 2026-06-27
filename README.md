@@ -65,3 +65,11 @@ NEXT_PUBLIC_BUILDER_CODE_DATA_SUFFIX=0x62635f33393564687471320b00802180218021802
 ```
 
 The encoded Builder Code is appended to Wagmi clients and contract writes so Base can detect onchain interactions.
+
+## Contract
+
+The deployed Base contract address is:
+
+```bash
+0x7436e55bb95Ce016938c16f8cB0B9158e537d088
+```
