@@ -134,3 +134,11 @@ npm run build
 ```
 
 ## Usage Notes
+
+This MiniApp is intentionally minimal.
+
+Voting and poll publishing are represented through the currently available deployed contract method.
+
+Future contract deployments can use the poll helper methods already present in the local contract source.
+
+Keep the attribution metadata in `app/layout.tsx` directly inside the `<head>`.
