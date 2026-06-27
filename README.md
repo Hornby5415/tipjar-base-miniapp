@@ -120,3 +120,9 @@ npm install
 Start the development server:
 
 ```bash
+npm run dev
+```
+
+Open the local development URL shown in the terminal.
+
+## Build
