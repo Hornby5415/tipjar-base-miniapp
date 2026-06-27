@@ -142,3 +142,11 @@ Voting and poll publishing are represented through the currently available deplo
 Future contract deployments can use the poll helper methods already present in the local contract source.
 
 Keep the attribution metadata in `app/layout.tsx` directly inside the `<head>`.
+
+Keep the `dataSuffix` value consistent between Wagmi configuration and contract write calls.
+
+## Repository
+
+Repository URL:
+
+https://github.com/Hornby5415/tipjar-base-miniapp.git
