@@ -36,3 +36,11 @@ The MiniApp supports the following wallet paths:
 - MetaMask through `injected()`
 - OKX through `injected()`
 - Coinbase Wallet through `coinbaseWallet()`
+
+When the Base App embedded wallet is detected, it can connect automatically.
+
+Users can still disconnect from the wallet button and choose another wallet from the wallet modal.
+
+## Attribution
+
+Offchain attribution is defined directly in `app/layout.tsx`.
