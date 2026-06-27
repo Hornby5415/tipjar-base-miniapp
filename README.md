@@ -89,3 +89,11 @@ The local contract source also includes poll helpers intended for a future redep
 ## Environment Variables
 
 Create a local environment file and set the deployed contract address and chain configuration.
+
+```bash
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x7436e55bb95Ce016938c16f8cB0B9158e537d088
+NEXT_PUBLIC_CHAIN_ID=8453
+NEXT_PUBLIC_BUILDER_CODE_DATA_SUFFIX=0x62635f33393564687471320b0080218021802180218021802180218021
+```
+
+Use Base Sepolia by setting:
