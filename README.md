@@ -73,3 +73,11 @@ The deployed Base contract address is:
 ```bash
 0x7436e55bb95Ce016938c16f8cB0B9158e537d088
 ```
+
+The deployed contract supports creator registration and tipping functions.
+
+The MiniApp currently uses `registerCreator` as the confirmed onchain proof for poll publishing and voting.
+
+This approach is used because `registerCreator` is available on the deployed contract.
+
+The local contract source also includes poll helpers intended for a future redeploy:
