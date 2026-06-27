@@ -21,3 +21,9 @@ Poll creation is intentionally simple and supports two options.
 - One clear primary action: cast a vote
 - Local reward feedback after the first interaction
 - Simple poll creation with two choices
+- Native Wagmi configuration
+- Support for injected wallets
+- Support for Coinbase Wallet
+- No RainbowKit dependency
+- No WalletConnect project ID
+- No WalletConnect connectors
