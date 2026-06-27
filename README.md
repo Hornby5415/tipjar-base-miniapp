@@ -13,3 +13,11 @@ The primary user action is voting in a poll.
 The first interaction provides immediate local reward feedback.
 
 Poll creation is intentionally simple and supports two options.
+
+## Features
+
+- Mobile-first layout for Base App and desktop browsers
+- English-only interface
+- One clear primary action: cast a vote
+- Local reward feedback after the first interaction
+- Simple poll creation with two choices
