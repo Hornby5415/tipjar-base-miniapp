@@ -27,3 +27,12 @@ Poll creation is intentionally simple and supports two options.
 - No RainbowKit dependency
 - No WalletConnect project ID
 - No WalletConnect connectors
+
+## Wallet Support
+
+The MiniApp supports the following wallet paths:
+
+- Base App embedded wallet through `injected()`
+- MetaMask through `injected()`
+- OKX through `injected()`
+- Coinbase Wallet through `coinbaseWallet()`
