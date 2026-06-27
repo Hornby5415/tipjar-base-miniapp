@@ -58,3 +58,10 @@ This allows Base to count Offchain attribution when users open the MiniApp.
 Onchain attribution is configured in `lib/wagmi.ts` using `dataSuffix`.
 
 Every `writeContract` call also passes the same `dataSuffix` explicitly.
+
+```bash
+NEXT_PUBLIC_BUILDER_CODE=bc_395dhtq2
+NEXT_PUBLIC_BUILDER_CODE_DATA_SUFFIX=0x62635f33393564687471320b0080218021802180218021802180218021
+```
+
+The encoded Builder Code is appended to Wagmi clients and contract writes so Base can detect onchain interactions.
