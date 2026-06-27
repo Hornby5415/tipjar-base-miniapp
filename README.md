@@ -81,3 +81,11 @@ The MiniApp currently uses `registerCreator` as the confirmed onchain proof for 
 This approach is used because `registerCreator` is available on the deployed contract.
 
 The local contract source also includes poll helpers intended for a future redeploy:
+
+- `createPoll(question, optionA, optionB)`
+- `castVote(pollId, option)`
+- `getPoll(pollId)`
+
+## Environment Variables
+
+Create a local environment file and set the deployed contract address and chain configuration.
