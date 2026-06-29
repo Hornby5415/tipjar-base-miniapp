@@ -107,3 +107,12 @@ NEXT_PUBLIC_CHAIN_ID=84532
 ```
 
 ## Local Development
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Hornby5415/tipjar-base-miniapp.git
+cd tipjar-base-miniapp
+```
+
+Install dependencies:
