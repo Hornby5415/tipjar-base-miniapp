@@ -140,3 +140,11 @@ npm run build
 ## Usage
 
 Use the app to create a simple two-option poll and cast a vote.
+
+The app presents one primary action at a time so the experience stays clear on mobile screens.
+
+The first interaction displays local reward feedback immediately.
+
+Publishing and voting are connected to the currently available deployed contract method.
+
+When a future contract deployment includes the poll helper methods, the app can be updated to use those methods directly.
