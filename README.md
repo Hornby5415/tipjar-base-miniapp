@@ -158,3 +158,11 @@ Keep the attribution metadata in `app/layout.tsx` directly inside the `<head>`.
 Keep the `dataSuffix` value consistent between Wagmi configuration and contract write calls.
 
 Do not add RainbowKit unless the wallet strategy changes.
+
+Do not add WalletConnect configuration unless the connection requirements change.
+
+## Repository
+
+Repository URL:
+
+https://github.com/Hornby5415/tipjar-base-miniapp.git
