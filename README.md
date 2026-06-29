@@ -23,3 +23,11 @@ Future contract deployments can use the poll helper methods already present in t
 - Mobile-first layout for Base App and desktop browsers
 - English-only user interface
 - Clear primary action for casting a vote
+- Immediate local reward feedback after the first interaction
+- Simple poll creation with two options
+- Native Wagmi configuration
+- Support for injected wallets
+- Support for Coinbase Wallet
+- No RainbowKit dependency
+- No WalletConnect project ID
+- No WalletConnect connectors
