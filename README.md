@@ -148,3 +148,13 @@ The first interaction displays local reward feedback immediately.
 Publishing and voting are connected to the currently available deployed contract method.
 
 When a future contract deployment includes the poll helper methods, the app can be updated to use those methods directly.
+
+## Notes
+
+This MiniApp is intentionally minimal.
+
+Keep the attribution metadata in `app/layout.tsx` directly inside the `<head>`.
+
+Keep the `dataSuffix` value consistent between Wagmi configuration and contract write calls.
+
+Do not add RainbowKit unless the wallet strategy changes.
