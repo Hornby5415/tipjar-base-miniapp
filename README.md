@@ -73,3 +73,11 @@ The encoded Builder Code is appended to Wagmi clients and contract writes so Bas
 ## Contract
 
 The deployed Base contract address is:
+
+```bash
+0x7436e55bb95Ce016938c16f8cB0B9158e537d088
+```
+
+The deployed contract supports creator registration and tipping functions.
+
+The MiniApp currently uses `registerCreator` as the confirmed onchain proof for poll publishing and voting.
