@@ -15,3 +15,11 @@ After the first interaction, the app provides immediate local reward feedback.
 Poll creation is intentionally lightweight and supports two choices.
 
 The current deployed contract flow uses an available contract method as the confirmed onchain action for publishing and voting.
+
+Future contract deployments can use the poll helper methods already present in the local contract source.
+
+## Features
+
+- Mobile-first layout for Base App and desktop browsers
+- English-only user interface
+- Clear primary action for casting a vote
