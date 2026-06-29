@@ -48,3 +48,11 @@ Users can still disconnect from the wallet button and choose another wallet from
 ## Attribution
 
 Offchain attribution is defined directly in `app/layout.tsx`.
+
+```tsx
+<meta name="base:app_id" content="6a212c211bf1ab98bb37b99b" />
+```
+
+This tag should remain directly inside the document `<head>`.
+
+It is not generated through the Next.js metadata API.
