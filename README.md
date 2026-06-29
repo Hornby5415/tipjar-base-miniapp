@@ -132,3 +132,11 @@ Open the local development URL shown in the terminal.
 ## Build
 
 Create a production build with:
+
+```bash
+npm run build
+```
+
+## Usage
+
+Use the app to create a simple two-option poll and cast a vote.
