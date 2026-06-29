@@ -31,3 +31,12 @@ Future contract deployments can use the poll helper methods already present in t
 - No RainbowKit dependency
 - No WalletConnect project ID
 - No WalletConnect connectors
+
+## Wallet Support
+
+The MiniApp supports these wallet connection paths:
+
+- Base App embedded wallet through `injected()`
+- MetaMask through `injected()`
+- OKX through `injected()`
+- Coinbase Wallet through `coinbaseWallet()`
