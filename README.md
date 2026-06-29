@@ -56,3 +56,12 @@ Offchain attribution is defined directly in `app/layout.tsx`.
 This tag should remain directly inside the document `<head>`.
 
 It is not generated through the Next.js metadata API.
+
+Keeping the tag in the document head allows Base to count Offchain attribution when users open the MiniApp.
+
+Onchain attribution is configured in `lib/wagmi.ts` with `dataSuffix`.
+
+Each `writeContract` call also passes the same `dataSuffix` explicitly.
+
+```bash
+NEXT_PUBLIC_BUILDER_CODE=bc_395dhtq2
