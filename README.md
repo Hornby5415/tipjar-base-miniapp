@@ -81,3 +81,11 @@ The deployed Base contract address is:
 The deployed contract supports creator registration and tipping functions.
 
 The MiniApp currently uses `registerCreator` as the confirmed onchain proof for poll publishing and voting.
+
+This approach is used because `registerCreator` is available on the deployed contract.
+
+The local contract source also includes poll helpers intended for a future redeploy:
+
+- `createPoll(question, optionA, optionB)`
+- `castVote(pollId, option)`
+- `getPoll(pollId)`
